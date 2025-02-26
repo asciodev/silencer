@@ -1,5 +1,7 @@
 {
 	"dependencies": {
-		"discord.js": "^14.18.0"
+		"@keyv/redis": "^4.2.0",
+		"discord.js": "^14.18.0",
+		"keyv": "^5.2.3"
 	}
 }
