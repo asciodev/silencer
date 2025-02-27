@@ -6,9 +6,7 @@ module.exports = {
     .setType(ApplicationCommandType.User),
 	async execute(interaction, db) {
     const { id } = interaction.targetMember;
-    const blackmailed = await db.get('blackmailed') ?? [];
-    blackmailed.push(id)
-    await db.set('blackmailed', blackmailed);
+    await db.set(id, 'blackmailed');
     const embed = new EmbedBuilder().setDescription(`${interaction.targetMember.user.username} has been blackmailed!`);
     await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 	},

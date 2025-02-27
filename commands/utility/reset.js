@@ -13,11 +13,14 @@ module.exports = {
       await interaction.reply({ embeds: [err], flags: MessageFlags.Ephemeral });
       return;
     }
-    for (const player of voice.channel.members) {
-      await player[1].voice.setMute(false);
-      await player[1].voice.setDeaf(false);
-    }
-    await db.clear();
     await interaction.reply({ embeds: [success], flags: MessageFlags.Ephemeral });
+    const members = voice.channel.members ?? [];
+    const voiceops = [];
+    for (const player of members) {
+      voiceops.push(player[1].voice.setMute(false));
+      voiceops.push(player[1].voice.setDeaf(false));
+    }
+    voiceops.push(db.clear());
+    await Promise.all(voiceops);
 	},
 };

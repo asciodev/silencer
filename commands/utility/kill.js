@@ -6,9 +6,7 @@ module.exports = {
     .setType(ApplicationCommandType.User),
 	async execute(interaction, db) {
     const { id } = interaction.targetMember;
-    const dead = await db.get('dead') ?? [];
-    dead.push(id)
-    await db.set('dead', dead);
+    await db.set(id, 'dead');
     const embed = new EmbedBuilder().setDescription(`${interaction.targetMember.user.username} has been killed!`);
     await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 	},

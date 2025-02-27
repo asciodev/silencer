@@ -6,9 +6,7 @@ module.exports = {
     .setType(ApplicationCommandType.User),
 	async execute(interaction, db) {
     const { id } = interaction.targetMember;
-    const dead = (await db.get('dead') ?? []).filter(deadId => deadId !== id);
-    await db.set('dead', dead);
-
+    await db.delete(id);
     const embed = new EmbedBuilder().setDescription(`${interaction.targetMember.user.username} has been revived!`);
     await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
 	},
