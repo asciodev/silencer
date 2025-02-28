@@ -5,9 +5,14 @@ module.exports = {
     .setName('Revive')
     .setType(ApplicationCommandType.User),
 	async execute(interaction, db) {
-    const { id } = interaction.targetMember;
-    await db.delete(id);
-    const embed = new EmbedBuilder().setDescription(`${interaction.targetMember.user.username} has been revived!`);
-    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+    const { targetMember } = interaction;
+    const embed = new EmbedBuilder().setDescription(`${targetMember.user.username} has been revived!`);
+    interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+    db.delete(targetMember.id);
+    if((await db.get('gamestate')) === 'meeting') {
+      interaction.guild.members.edit(targetMember.id, {
+        mute: false,
+      });
+    }
 	},
 };

@@ -5,9 +5,14 @@ module.exports = {
     .setName('Kill')
     .setType(ApplicationCommandType.User),
 	async execute(interaction, db) {
-    const { id } = interaction.targetMember;
-    await db.set(id, 'dead');
-    const embed = new EmbedBuilder().setDescription(`${interaction.targetMember.user.username} has been killed!`);
-    await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+    const { targetMember } = interaction;
+    const embed = new EmbedBuilder().setDescription(`${targetMember.user.username} has been killed!`);
+    interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
+    db.set(targetMember.id, 'dead');
+    if((await db.get('gamestate')) === 'meeting') {
+      interaction.guild.members.edit(targetMember.id, {
+        mute: true,
+      });
+    }
 	},
 };

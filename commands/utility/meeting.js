@@ -5,21 +5,25 @@ module.exports = {
     .setName('Meeting')
     .setType(ApplicationCommandType.User),
 	async execute(interaction, db) {
-    const embed = new EmbedBuilder().setDescription(`A meeting has been called - dead and blackmailed players will be muted.`);
+    const embed = new EmbedBuilder().setDescription(`A meeting has been called - dead players will be muted.`);
     await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
-    const { voice } = interaction.targetMember;
-    const members = voice.channel.members ?? [];
-    const voiceops = [];
-    for (const player of members) {
-      const status = await db.get(player[0]);
+    const { guild } = interaction;
+    const players = await db.get("players") ?? [];
+    db.set('gamestate', 'meeting');
+    for (const player of players) {
+      const status = await db.get(player);
       if(status === 'dead' || status === 'blackmailed') {
-        voiceops.push(player[1].voice.setMute(true));
-        voiceops.push(player[1].voice.setDeaf(false));
+        guild.members.edit(player, {
+          deaf: false,
+          mute: true,
+        })
+        if(status === 'blackmailed') db.delete(player);
       } else {
-        voiceops.push(player[1].voice.setMute(false));
-        voiceops.push(player[1].voice.setDeaf(false));        
+        guild.members.edit(player, {
+          deaf: false,
+          mute: false,
+        })
       }
     }
-    await Promise.all(voiceops);
 	},
 };

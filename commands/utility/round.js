@@ -8,19 +8,22 @@ module.exports = {
     const embed = new EmbedBuilder().setDescription(`A round has been called - living players will be deafened.`);
     await interaction.reply({ embeds: [embed], flags: MessageFlags.Ephemeral });
     const { voice } = interaction.targetMember;
-    const members = voice.channel.members ?? [];
-    const voiceops = [];
-    for (const player of members) {
-      const status = await db.get(player[0]);
+    const { guild } = interaction;
+    db.set('gamestate', 'round');
+    const players = await db.get("players") ?? [];
+    for (const player of players) {
+      const status = await db.get(player);
       if(status === 'dead') {
-        voiceops.push(player[1].voice.setMute(false));
-        voiceops.push(player[1].voice.setDeaf(false));
+        guild.members.edit(player, {
+          deaf: false,
+          mute: false,
+        })
       } else {
-        voiceops.push(player[1].voice.setMute(true));
-        voiceops.push(player[1].voice.setDeaf(true));
-        voiceops.push(db.delete(player[0]));
+        guild.members.edit(player, {
+          deaf: true,
+          mute: true,
+        })
       }
     }
-    await Promise.all(voiceops);
 	},
 };
